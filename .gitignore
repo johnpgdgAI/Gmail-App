@@ -1,0 +1,57 @@
+import os
+from google_auth_oauthlib.flow import InstalledAppFlow
+
+
+def verify_credentials_path(file_path):
+    """
+    Verify the existence of the credentials file.
+
+    Args:
+        file_path (str): The path to the credentials file.
+
+    Returns:
+        str: The absolute path to the file if found.
+
+    Raises:
+        FileNotFoundError: If the file does not exist.
+    """
+    if os.path.exists(file_path):
+        print(f"Credentials file found: {os.path.abspath(file_path)}")
+        return os.path.abspath(file_path)
+    else:
+        raise FileNotFoundError(f"No such file or directory: '{file_path}'")
+
+
+def authenticate_with_google(client_secrets_file):
+    """
+    Authenticate with Google using the OAuth client secrets file.
+
+    Args:
+        client_secrets_file (str): Path to the client secrets file.
+
+    Returns:
+        Credentials object for accessing Google APIs.
+    """
+    # Verify the path to the credentials file
+    client_secrets_file = verify_credentials_path(client_secrets_file)
+
+    # Define the scopes required for the application
+    scopes = ['https://www.googleapis.com/auth/gmail.readonly']
+
+    # Run the OAuth flow
+    flow = InstalledAppFlow.from_client_secrets_file(client_secrets_file, scopes)
+    credentials = flow.run_local_server(port=0)
+    print("Authentication successful!")
+    return credentials
+
+
+# Path to your Google client secrets file
+client_secrets_file = r"C:\Users\jlodl\OneDrive\Desktop\Email Org app\JSON data\client_secret.json"
+
+# Authenticate with Google
+try:
+    credentials = authenticate_with_google(client_secrets_file)
+except FileNotFoundError as e:
+    print(str(e))
+except Exception as e:
+    print(f"An unexpected error occurred: {e}")
